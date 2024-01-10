@@ -1,3 +1,7 @@
+import build.less.plugin.gradle.ApiKey
+import build.less.plugin.gradle.MutableAgentCacheSettings
+import java.util.Properties
+
 rootProject.name = "FancyApp"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -10,6 +14,10 @@ pluginManagement {
     }
 }
 
+plugins {
+    id("build.less") version "1.0.0-rc2"
+}
+
 dependencyResolutionManagement {
     repositories {
         google()
@@ -19,3 +27,14 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
+
+buildless {
+    val properties = Properties().apply {
+        rootProject.projectDir.resolve(relative = "local.properties").inputStream().use {
+            load(it)
+        }
+    }
+    val apiKey = properties.getProperty("buildless.user.key")
+        ?: throw Exception("Need Buildless key!")
+    apiKey(ApiKey.forUser(apiKey))
+}
